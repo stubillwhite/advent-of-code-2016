@@ -1,17 +1,22 @@
 (ns advent-of-code-2016.day-1
-  (:require [advent-of-code-2016.utils :refer [def-]]
+  (:require [clojure.java.io :as io]
             [clojure.string :as string]))
 
-(def directions-to-hq
-  (let [raw-input "L5, R1, R4, L5, L4, R3, R1, L1, R4, R5, L1, L3, R4, L2, L4, R2, L4, L1, R3, R1, R1, L1, R1, L5, R5, R2, L5, R2, R1, L2, L4, L4, R191, R2, R5, R1, L1, L2, R5, L2, L3, R4, L1, L1, R1, R50, L1, R1, R76, R5, R4, R2, L5, L3, L5, R2, R1, L1, R2, L3, R4, R2, L1, L1, R4, L1, L1, R185, R1, L5, L4, L5, L3, R2, R3, R1, L5, R1, L3, L2, L2, R5, L1, L1, L3, R1, R4, L2, L1, L1, L3, L4, R5, L2, R3, R5, R1, L4, R5, L3, R3, R3, R1, R1, R5, R2, L2, R5, L5, L4, R4, R3, R5, R1, L3, R1, L2, L2, R3, R4, L1, R4, L1, R4, R3, L1, L4, L1, L5, L2, R2, L1, R1, L5, L3, R4, L1, R5, L5, L5, L1, L3, R1, R5, L2, L4, L5, L1, L1, L2, R5, R5, L4, R3, L2, L1, L3, L4, L5, L5, L2, R4, R3, L5, R4, R2, R1, L5"]
-    (string/split raw-input #", ")))
+(def steps-to-hq
+  (-> (io/resource "day-1-input.txt")
+      slurp
+      (string/trim)
+      (string/split #", ")))
 
-(def- initial-state
-  {:x      0
-   :y      0
-   :facing :north})
+(defn create-state [steps]
+  {:x          0
+   :y          0
+   :facing     :north
+   :visited    #{}
+   :steps      steps
+   :curr-step  nil})
 
-(defn- rotate [{:keys [facing]} dir]
+(defn- rotate [facing dir]
   (get-in {\L {:north :west
                :east  :north
                :south :east
@@ -19,35 +24,61 @@
            \R {:north :east
                :east  :south
                :south :west
-               :west  :north}}
+               :west  :north}
+           \S {:north :north
+               :east  :east
+               :south :south
+               :west  :west}}
           [dir facing]))
 
-(defn- coordinate-multiplier [dir]
-  (get {:north {:x 0  :y 1}
-        :east  {:x 1  :y 0}
-        :south {:x 0  :y -1}
-        :west  {:x -1 :y 0}}
+(defn- coordinate-delta [dir]
+  (get {:north [  0  1 ]
+        :east  [  1  0 ]
+        :south [  0 -1 ]
+        :west  [ -1  0 ]}
        dir))
 
-(defn- follow-direction [state direction]
-  (let [dir        (first (seq direction))
-        dist       (Long/valueOf (string/join (rest (seq direction))))
-        facing     (rotate state dir)
-        multiplier (coordinate-multiplier facing)]
-    (-> state
-        (update :x (fn [x] (+ x (* dist (:x multiplier)))))
-        (update :y (fn [y] (+ y (* dist (:y multiplier)))))
-        (assoc :facing facing))))
+(defn- decode-step [step]
+  [(first (seq step))
+   (Long/valueOf (string/join (rest (seq step))))])
+
+(defn update-steps [steps]
+  (let [[dir dist] (decode-step (first steps))]
+    (if (= 1 dist)
+      (rest steps)
+      (cons (str "S" (dec dist)) (rest steps)))))
+
+(defn- update-state [{:keys [x y facing visited steps curr-step]}]
+  (let [step       (first steps)
+        [dir dist] (decode-step step)
+        new-facing (rotate facing dir)
+        [dx dy]    (coordinate-delta new-facing)]
+    {:x         (+ x dx)
+     :y         (+ y dy)
+     :facing    new-facing
+     :visited   (conj visited [x y])
+     :steps     (update-steps steps)}))
 
 (defn- cityblock-distance [{:keys [x y]}]
   (+ (Math/abs x) (Math/abs y)))
 
-(defn- relative-coordinates [directions]
-  (reduce follow-direction initial-state directions))
+(defn- follow-steps [state arrived?]
+  (loop [state state]
+    (if (arrived? state)
+      state
+      (recur (update-state state)))))
 
-(defn distance-to-destination [directions]
-  (cityblock-distance (relative-coordinates directions)))
+(defn distance-to-destination [state arrived?]
+  (cityblock-distance (follow-steps state arrived?)))
+
+(defn all-steps-completed? [{:keys [steps]}]
+  (not (seq steps)))
 
 (defn solution-part-one []
-  (cityblock-distance (relative-coordinates directions-to-hq)))
+  (distance-to-destination (create-state steps-to-hq) all-steps-completed?))
 
+(defn visited-twice? [{:keys [x y visited]}]
+  (contains? visited [x y]))
+
+(defn solution-part-two []
+  (distance-to-destination (create-state steps-to-hq) visited-twice?))
