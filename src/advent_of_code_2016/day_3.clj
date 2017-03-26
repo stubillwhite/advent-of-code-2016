@@ -16,9 +16,6 @@
 (def horizontal-partitioner
   (fn [s] (partition 3 s)))
 
-
-(partition 9 solution-part-two-example-input)
-
 (def vertical-partitioner
   (fn [s] (apply concat
                 (for [[a d g

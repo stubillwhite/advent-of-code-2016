@@ -15,12 +15,12 @@
   (is (= (valid? [25 10 5]) false)))
 
 (deftest count-of-valid-triangles-given-all-invalid-then-zero
-  (is (= (count-of-valid-triangles [[5 10 25]]) 0)))
+  (is (= (count-of-valid-triangles [5 10 25] horizontal-partitioner) 0)))
 
 (deftest count-of-valid-triangles-given-some-valid-then-count
-  (is (= (count-of-valid-triangles [[3 4 5]
-                                    [30 40 50]
-                                    [5 10 25]]) 2)))
+  (is (= (count-of-valid-triangles [3 4 5
+                                    30 40 50
+                                    5 10 25] horizontal-partitioner) 2)))
 
 (deftest solution-part-one-then-expected-result
   (is (= (solution-part-one) 862)))
