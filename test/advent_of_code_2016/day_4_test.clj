@@ -28,5 +28,11 @@
 (deftest sum-of-sector-ids-given-example-input-then-expected-result
   (is (= (sum-of-sector-ids example-input) 1514)))
 
-(deftest solution-part-two-then-expected-result
+(deftest solution-part-one-then-expected-result
   (is (= (solution-part-one) 245102)))
+
+(deftest decrypt-given-exaple-input-then-expected-result
+  (is (= (decrypt "qzmt-zixmtkozy-ivhz" 343) "very encrypted name")))
+
+(deftest solution-part-two-then-expected-result
+  (is (= (solution-part-two) 324)))

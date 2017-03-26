@@ -1,5 +1,6 @@
 (ns advent-of-code-2016.day-4
-  (:require [clojure.java.io :as io]
+  (:require [advent-of-code-2016.utils :refer [def-]]
+            [clojure.java.io :as io]
             [clojure.string :as string]))
 
 (def raw-input
@@ -41,4 +42,35 @@
 
 (defn solution-part-one []
   (sum-of-sector-ids raw-input))
+
+(def- cyclic-alphabet
+  (cycle (for [x (range (int \a) (inc (int \z)))] (char x))))
+
+(defn rot-n-char [ch n]
+  (nth (drop-while (fn [x] (not= x ch)) cyclic-alphabet) n))
+
+(defn decrypt [s key]
+  (string/join
+   (for [ch (seq s)]
+     (if (= \- ch)
+       \space
+       (rot-n-char ch key)))))
+
+(defn- add-decrypted-name [{:keys [name security-id] :as room}]
+  (assoc room :decrypted-name (decrypt name security-id)))
+
+(defn- object-store? [room]
+  (let [decrypted-name-contains? (fn [s] (.contains (:decrypted-name room) s))]
+    (and (decrypted-name-contains? "north")
+         (decrypted-name-contains? "pole")
+         (decrypted-name-contains? "object"))))
+
+(defn solution-part-two []
+  (->> raw-input
+       (map decode-room-id)
+       (filter real?)
+       (map add-decrypted-name)
+       (filter object-store?)
+       (first)
+       (:security-id)))
 
