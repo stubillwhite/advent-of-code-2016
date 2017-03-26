@@ -3,17 +3,37 @@
             [clojure.java.io :as io]
             [clojure.string :as string]))
 
-(defn- create-keypad [k]
+(defn create-keypad [k]
   (let [indices (for [y (range (count k))
                       x (range (count (first k)))] [x y])]
-    (into {} (zipmap indices (mapcat seq k)))))
+    (->> (zipmap indices (mapcat seq k))
+         (filter (fn [[k v]] (not= v \space)))
+         (into {}))))
 
-(def initial-state
-  {:pos    [1 1]
+(defn create-input-terminal [start-pos keypad]
+  {:start-pos start-pos
+   :keypad    keypad})
+
+(def square-terminal
+  (create-input-terminal
+   [1 1]
+   (create-keypad ["123"
+                   "456"
+                   "789"])))
+
+(def diamond-terminal
+  (create-input-terminal
+   [0 3]
+   (create-keypad ["  1  "
+                   " 234 "
+                   "56789"
+                   " ABC "
+                   "  D  "])))
+
+(defn initial-state [input-terminal]
+  {:pos    (:start-pos input-terminal)
    :digits ""
-   :keypad (create-keypad ["123"
-                           "456"
-                           "789"])})
+   :keypad (:keypad input-terminal)})
 
 (defn- add-coordinates [[x1 y1] [x2 y2]]
   [(+ x1 x2) (+ y1 y2)])
@@ -46,5 +66,7 @@
     (string/split raw-input #"\n")))
 
 (defn solution-part-one []
-  (calculate-code initial-state keypad-instructions))
+  (calculate-code (initial-state square-terminal) keypad-instructions))
 
+(defn solution-part-two []
+  (calculate-code (initial-state diamond-terminal) keypad-instructions))
