@@ -10,9 +10,7 @@
             [clojure.edn :as edn]
             [clojure.tools.namespace.repl :refer [refresh refresh-all]]
             [clojure.tools.trace :refer [trace-ns untrace-ns]]
-            [mount.core :as mount]
-            [advent-of-code-2016.config :refer [config]]
-            [advent-of-code-2016.app :refer [nrepl]]))
+            [mount.core :as mount]))
 
 (defn print-methods [x]
   (->> x
