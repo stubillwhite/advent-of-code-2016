@@ -24,3 +24,23 @@
 
 (deftest solution-part-one-then-expected-result
   (is (= (solution-part-one) 862)))
+
+(def solution-part-two-example-input
+  [101 301 501
+   102 302 502
+   103 303 503
+   201 401 601
+   202 402 602
+   203 403 603])
+
+(deftest vertical-partitioner-given-example-input-then-expected-triangles
+  (let [expected [[101 102 103]
+                  [301 302 303]
+                  [501 502 503]
+                  [201 202 203]
+                  [401 402 403]
+                  [601 602 603]]]
+    (is (= (vertical-partitioner solution-part-two-example-input) expected))))
+
+(deftest solution-part-two-then-expected-result
+  (is (= (solution-part-two) 1577)))
