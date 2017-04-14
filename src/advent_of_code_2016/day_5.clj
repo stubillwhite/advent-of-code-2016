@@ -56,5 +56,5 @@
               (set-char password (first hashes))
               (rest hashes))))))
 
-
-
+(defn solution-part-two []
+  (complex-password "abbhdwsy"))
