@@ -23,3 +23,6 @@
 
 (deftest error-correct-given-example-input-then-example-output
   (is (= (error-correct test-messages) "easter")))
+
+(deftest modified-error-correct-given-example-input-then-example-output
+  (is (= (modified-error-correct test-messages) "advent")))

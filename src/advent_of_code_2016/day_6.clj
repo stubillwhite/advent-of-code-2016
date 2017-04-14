@@ -29,4 +29,15 @@
 (defn solution-part-one []
   (error-correct messages))
 
+(defn- least-frequent [fs]
+  (key (apply min-key val fs)))
+
+(defn modified-error-correct [msgs]
+  (->> (transpose msgs)
+       (map freqs)
+       (map least-frequent)
+       (apply str)))
+
+(defn solution-part-two []
+  (modified-error-correct messages))
 
