@@ -8,32 +8,22 @@
 (def addresses
   (string/split (slurp (io/resource "day-7-input.txt")) #"\n"))
 
-(defn- palindrome? [s]
-  (= (seq s) (reverse (seq s))))
+(def- re-abba "(\\w)(?!\\1)(\\w)\\2\\1")
 
-(defn abba? [s]
-  (loop [s (seq s)]
-    (let [[a b c d] s]
-      (cond
-        (nil? d)                     false
-        (and (palindrome? [a b c d])
-             (not (= a b)))          true
-        :else                        (recur (rest s))))))
+(def- re-hypernet
+  (str
+   "\\[\\w*?"
+   re-abba
+   "\\w*?\\]"))
 
-(defn- hypernet? [x]
-  (and (string/starts-with? x "[")
-       (string/ends-with? x "]")) )
+(defn- abba-anywhere? [s]
+  (not (nil? (re-find (re-pattern re-abba) s))))
 
-(defn parse-address [s]
-  (let [tokens (re-seq #"[^\[\]]+|\[.*?\]" s)
-        parts  (group-by hypernet? tokens)]
-    {:hyper (map (fn [x] (subs x 1 (dec (.length x)))) (parts true))
-     :other (parts false)}))
+(defn- abba-in-hypernet? [s]
+  (not (nil? (re-find (re-pattern re-hypernet) s))))
 
 (defn supports-tls? [s]
-  (let [{:keys [hyper other]} (parse-address s)]
-    (true? (and (some abba? other)
-                (not (some abba? hyper))))))
+  (and (abba-anywhere? s) (not (abba-in-hypernet? s))))
 
 (defn solution-part-one []
   (->> addresses
