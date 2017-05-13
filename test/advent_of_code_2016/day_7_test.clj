@@ -15,3 +15,8 @@
   (is (= (supports-tls? "abcd[efgh]ijkl[mnop]qrxyyxst")     true))
   (is (= (supports-tls? "abcd[efgh]ijkl[mnxyyxop]qrxyyxst") false)))
 
+(deftest supports-ssl?-give-example-input-then-example-output
+  (is (= (supports-ssl? "aba[bab]xyz") true))
+  (is (= (supports-ssl? "xyx[xyx]xyx") false))
+  (is (= (supports-ssl? "aaa[kek]eke") true))
+  (is (= (supports-ssl? "zazbz[bzb]cdb") true)))
