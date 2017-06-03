@@ -100,6 +100,11 @@
            (display 50 6)
            commands)))
 
+;; One of the rare cases where my debugging code has actually done all the work for part two already, so this is trivial
 
-
-
+(defn solution-part-two []
+  (print
+   (display-to-string
+    (reduce execute-command
+            (display 50 6)
+            commands))))
